@@ -40,7 +40,7 @@
 			})
 		</script>
 		<script>
-			var socket = io();
+			var socket = io({transports: ['websocket']});
 			socket.emit('registerPlayer', {
 				room: location.pathname.substr(1),
 				nickname: localStorage.getItem('nickname'),

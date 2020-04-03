@@ -3,10 +3,8 @@ const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
-var Rooms = require('./room');
+var Rooms = require('./server/room');
 let Room = Rooms.Room;
-
-var WaitingRoom = require('./public/waitingRoomShared').GameState;
 
 rooms = {}
 
@@ -44,11 +42,9 @@ app.get('*', function(req, res) {
 
 app.post('/createRoom', function(req, res) {
 	let createdRoom = new Room(req.body.min, req.body.max);
-
 	switch(createdRoom.isValid(req.body.roomName, rooms)) {
 		case Rooms.VALID:
 			rooms[req.body.roomName] = createdRoom;
-			rooms[req.body.roomName].gameState = new WaitingRoom();
 			res.send("Success");
 			break;
 		case Rooms.EXISTS:
@@ -85,13 +81,14 @@ io.on('connection', function(socket) {
 
 setInterval(function() {
 	Object.keys(rooms).forEach(function(key) {
-		if(rooms[key].gameState) {
-			rooms[key].gameState.update(rooms[key].input);
-			io.to(key).emit('gameState', rooms[key].gameState.getGameState());
+		if(rooms[key].gameManager.gameState) {
+			rooms[key].gameManager.gameState.update(rooms[key].gameManager.input);
+			io.to(key).emit('gameState', rooms[key].gameManager.gameState.getGameState());
 		}
 	})
 }, 1000 / 60);
 
-http.listen(3000, function() {
-	console.log('listening on *:3000');
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, function() {
+	console.log('Server listening on port ' + PORT);
 });

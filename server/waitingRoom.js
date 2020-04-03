@@ -1,5 +1,5 @@
-function GameState() {
-	this.players = [];
+function WaitingRoom() {
+	this.players = {};
 
 	this.onRegisterPlayer = function(id) {
 		this.players[id] = {id: id, x: 0, y: 0, velX: 0, velY: 0}
@@ -71,6 +71,4 @@ function GameState() {
 	}
 }
 
-module.exports = {
-	GameState: GameState
-}
+module.exports = WaitingRoom

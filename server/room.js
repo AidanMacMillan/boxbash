@@ -1,3 +1,5 @@
+var GameManager = require('./gameManager');
+
 const VALID = 0;
 const EXISTS = 1;
 const BAD_REQUEST = 2;
@@ -6,11 +8,11 @@ function Room(min, max) {
 	this.players = [];
 	this.min = min;
 	this.max = max;
-	this.input = {};
+	this.gameManager = new GameManager();
 
 	this.registerPlayer = function(id, nickname, skin) {
 		this.players.push({id: id, nickname: nickname, skin: skin});
-		this.gameState.onRegisterPlayer(id);
+		this.gameManager.gameState.onRegisterPlayer(id);
 	}
 
 	this.disconnectPlayer = function(id) {
@@ -20,11 +22,11 @@ function Room(min, max) {
 				break;
 			}
 		}
-		this.gameState.onDisconnectPlayer(id);
+		this.gameManager.gameState.onDisconnectPlayer(id);
 	}
 
 	this.setInput = function(id, input) {
-		this.input[id] = input;
+		this.gameManager.input[id] = input;
 	}
 
 	this.getRoom = function() {
