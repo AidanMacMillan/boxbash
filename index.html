@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>BoxBash.io</title>
+		<link href="https://fonts.googleapis.com/css2?family=Blinker:wght@300;600&display=swap" rel="stylesheet">
+		<style>
+			body {
+				font-family: 'Blinker', sans-serif;
+
+				animation: colorRotation 30s infinite; 
+				color: white;
+
+				text-align: center;
+				height: 100%;
+			}
+
+			@keyframes colorRotation {
+				0%   {background: red;}
+				16%  {background: orange;}
+				32%  {background: yellowgreen;}
+				48%	 {background: cyan;}
+				64%  {background: blue;}
+				80%  {background: purple;}
+				100% {background: red;}
+			}
+
+			@keyframes textColorRotation {
+				0%   {color: #800000;}
+				16%  {color: #805300;}
+				32%  {color: #4d6719;}
+				48%	 {color: #008080;}
+				64%  {color: #000080;}
+				80%  {color: #4d004d;}
+				100% {color: #800000;}
+			}
+
+			.title {
+				font-weight: semi-bold;
+				font-size: 3em;
+
+				text-shadow: 0px 3px rgba(0,0,0,0.5);
+			}
+
+			.center {
+				position: absolute;
+				display: flex;
+				
+				margin-top: 40px;
+				left: 50%;
+				top: 50%;
+				transform: translateX(-50%);
+
+				justify-content: space-around;
+				align-items: center;
+				width: calc(100% - 40px);
+				padding: 0px 40px;
+				box-sizing: border-box;
+				max-width: 600px;
+			}
+
+			button {
+				font-size: 28px;
+				
+				box-sizing: border-box;
+				height: 48px;
+				min-width: 200px;
+
+				font-family: 'Blinker', sans-serif;
+
+				border: none;
+				background-color: white;
+
+				box-shadow: 0px 3px rgba(0,0,0,0.25);
+
+				cursor: pointer;
+
+				transition: 0.2s;
+
+				animation: textColorRotation 30s infinite;
+			}
+
+			button:hover {
+				transform: scale(1.05);
+			}
+
+			.create, .join {
+				pointer-events: none;
+				position: absolute;
+				width: 100%;
+				transition: 0.4s;
+			}
+
+			.create {
+				text-align: left;
+			}
+
+			.join {
+				text-align: right;
+			}
+
+			input {
+				width: 100%;
+				height: 40px;
+
+				padding: 4px;
+				box-sizing: border-box;
+
+				border: none;
+				background-color: white;
+				box-shadow: 0px 3px rgba(0,0,0,0.25);
+
+				text-align: center;
+
+				font-size: 20px;
+
+				font-family: 'Blinker', sans-serif;
+			}
+
+			label {
+				width: 100%;
+				height: 40px;
+
+				padding: 8px;
+				box-sizing: border-box;
+
+				border: none;
+				background-color: rgb(245,245,245,1);
+				box-shadow: 0px 3px rgba(0,0,0,0.25);
+
+				text-align: left;
+
+				font-size: 20px;
+				color: #333;
+				font-family: 'Blinker', sans-serif;
+			}
+
+			.joinForm input, .createForm input {
+				margin-bottom: 10px;
+			}
+
+			.joinForm, .createForm {
+				pointer-events: none;
+				max-height: 0;
+				overflow: hidden;
+				opacity: 0;
+				transition: 1s;
+			}
+
+			body[data-state="join"] .joinForm, body[data-state="create"] .createForm {
+				pointer-events: all;
+				opacity: 1;
+				padding-bottom: 10px;
+			}
+
+			body[data-state="join"] .joinForm {
+				max-height: 450px;
+			}
+
+			body[data-state="create"] .createForm {
+				max-height: 600px;
+			}			
+
+			#join, #create {
+				pointer-events: all;
+				transition: 0.5s;
+			}
+
+			body[data-state="join"] #join, body[data-state="create"] #create {
+				min-width: 100%;
+			}
+
+			body[data-state="join"] #create, body[data-state="create"] #join {
+				pointer-events: none;
+				opacity: 0;
+			}
+
+			body[data-state="create"] .create .back, body[data-state="join"] .join .back {
+				pointer-events: all;
+				opacity: 1;
+			}
+
+			#joinPlayer, #createPlayer {
+				width: 50%;
+				background-color: white;
+				cursor: crosshair;
+				image-rendering: pixelated;
+				outline: solid 1px rgba(0,0,0,0.5);
+			}
+
+			.back {
+				position: absolute;
+				left: 0px;
+				top: -50px;
+				pointer-events: none;
+				opacity: 0;
+				margin-bottom: 10px;
+				height: 40px;
+				font-size: 24px;
+				color: #333;
+				animation: none;
+				transition: 0.5s;
+			}
+
+			.playerCustomizer {
+				width: 100%;
+				text-align: left;
+				background-color: white;
+				padding: 10px;
+				box-sizing: border-box;
+				box-shadow: 0px 3px rgba(0,0,0,0.25);
+			}
+
+			.colors {
+				box-sizing: border-box;
+				padding-left: 10px;
+				max-width: 50%;
+				float: right;
+			}
+
+			.color {
+				float: left;
+				width: 20px;
+				height: 20px;
+				transition: 0.2s;
+			}
+
+			.color:hover {
+				cursor: pointer;
+				transform: scale(1.2);
+				transition: 0s;
+				outline: solid 1px rgba(0,0,0,0.5);
+			}
+
+			.formRow {
+				display: grid;
+
+				grid-template-columns: 40% 10% 40% 10%;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 class="title">BoxBash.io</h1>
+		<div class="center">
+			<div class="create">
+				<button class="back">Back</button>
+				<form id="createForm">
+					<div class="createForm">
+						<input id="createRoomName" placeholder="Room Name" minlength="3" maxLength="16" pattern="[A-Za-z0-9]+"
+							title="Letters and numbers only. No spaces or special characters allowed." required>
+						<div class="formRow">
+							<label for="minPlayers">Min Players</label>
+							<input id="minPlayers" type="number" value="2" min="2" max="8" required> 
+							<label for="minPlayers">Max Players</label>
+							<input id="maxPlayers" type="number" value="8"  min="2" max="8" required>
+						</div>
+						<input id="createNickname" placeholder="Nickname" minlength="3" maxlength="16" required>
+						<div class="playerCustomizer">
+							<canvas id="createPlayer" width="12" height="12"></canvas>
+							<div class="colors">
+								<div class="color" style="background-color: white;"></div>
+								<div class="color" style="background-color: lightgray;"></div>
+								<div class="color" style="background-color: silver;"></div>
+								<div class="color" style="background-color: darkgray;"></div>
+								<div class="color" style="background-color: dimgray;"></div>
+								<div class="color" style="background-color: black;"></div>
+								<div class="color" style="background-color: cornsilk;"></div>
+								<div class="color" style="background-color: BlanchedAlmond;"></div>
+								<div class="color" style="background-color: NavajoWhite;"></div>
+								<div class="color" style="background-color: Burlywood;"></div>
+								<div class="color" style="background-color: Peru;"></div>
+								<div class="color" style="background-color: chocolate;"></div>
+								<div class="color" style="background-color: Sienna;"></div>
+								<div class="color" style="background-color: SaddleBrown;"></div>
+								<div class="color" style="background-color: #ff9999;"></div>
+								<div class="color" style="background-color: #ffcc99;"></div>
+								<div class="color" style="background-color: #ffff99;"></div>
+								<div class="color" style="background-color: #ccff99;"></div>
+								<div class="color" style="background-color: #99ff99;"></div>
+								<div class="color" style="background-color: #99ffe6;"></div>
+								<div class="color" style="background-color: #99ffff;"></div>
+								<div class="color" style="background-color: #99e6ff;"></div>
+								<div class="color" style="background-color: #99ccff;"></div>
+								<div class="color" style="background-color: #9999ff;"></div>
+								<div class="color" style="background-color: #cc99ff;"></div>
+								<div class="color" style="background-color: #ff0000;"></div>
+								<div class="color" style="background-color: #ff8000;"></div>
+								<div class="color" style="background-color: #ffff00;"></div>
+								<div class="color" style="background-color: #bfff00;"></div>
+								<div class="color" style="background-color: #40ff00;"></div>
+								<div class="color" style="background-color: #00ffbf;"></div>
+								<div class="color" style="background-color: #00ffff;"></div>
+								<div class="color" style="background-color: #00bfff;"></div>
+								<div class="color" style="background-color: #0040ff;"></div>
+								<div class="color" style="background-color: #8000ff;"></div>
+								<div class="color" style="background-color: #bf00ff;"></div>
+
+								<div class="color" style="background-color: #990000;"></div>
+								<div class="color" style="background-color: #994d00;"></div>
+								<div class="color" style="background-color: #999900;"></div>
+								<div class="color" style="background-color: #739900;"></div>
+								<div class="color" style="background-color: #269900;"></div>
+								<div class="color" style="background-color: #00994d;"></div>
+								<div class="color" style="background-color: #009973;"></div>
+								<div class="color" style="background-color: #004d99;"></div>
+								<div class="color" style="background-color: #000099;"></div>
+								<div class="color" style="background-color: #4d0099;"></div>
+								<div class="color" style="background-color: #730099;"></div>
+							</div>
+						</div>
+					</div>
+					<button id="create">Create Room</button>
+				</form>
+			</div>
+			<div class="join">
+				<button class="back">Back</button>
+				<form id="joinForm">
+					<div class="joinForm">
+						<input id="joinRoomName" placeholder="Room Name">
+						<input id="joinNickname" placeholder="Nickname">
+						<div class="playerCustomizer">
+							<canvas id="joinPlayer" width="12" height="12"></canvas>
+							<div class="colors">
+								<div class="color" style="background-color: white;"></div>
+								<div class="color" style="background-color: lightgray;"></div>
+								<div class="color" style="background-color: silver;"></div>
+								<div class="color" style="background-color: darkgray;"></div>
+								<div class="color" style="background-color: dimgray;"></div>
+								<div class="color" style="background-color: black;"></div>
+								<div class="color" style="background-color: cornsilk;"></div>
+								<div class="color" style="background-color: BlanchedAlmond;"></div>
+								<div class="color" style="background-color: NavajoWhite;"></div>
+								<div class="color" style="background-color: Burlywood;"></div>
+								<div class="color" style="background-color: Peru;"></div>
+								<div class="color" style="background-color: chocolate;"></div>
+								<div class="color" style="background-color: Sienna;"></div>
+								<div class="color" style="background-color: SaddleBrown;"></div>
+								<div class="color" style="background-color: #ff9999;"></div>
+								<div class="color" style="background-color: #ffcc99;"></div>
+								<div class="color" style="background-color: #ffff99;"></div>
+								<div class="color" style="background-color: #ccff99;"></div>
+								<div class="color" style="background-color: #99ff99;"></div>
+								<div class="color" style="background-color: #99ffe6;"></div>
+								<div class="color" style="background-color: #99ffff;"></div>
+								<div class="color" style="background-color: #99e6ff;"></div>
+								<div class="color" style="background-color: #99ccff;"></div>
+								<div class="color" style="background-color: #9999ff;"></div>
+								<div class="color" style="background-color: #cc99ff;"></div>
+								<div class="color" style="background-color: #ff0000;"></div>
+								<div class="color" style="background-color: #ff8000;"></div>
+								<div class="color" style="background-color: #ffff00;"></div>
+								<div class="color" style="background-color: #bfff00;"></div>
+								<div class="color" style="background-color: #40ff00;"></div>
+								<div class="color" style="background-color: #00ffbf;"></div>
+								<div class="color" style="background-color: #00ffff;"></div>
+								<div class="color" style="background-color: #00bfff;"></div>
+								<div class="color" style="background-color: #0040ff;"></div>
+								<div class="color" style="background-color: #8000ff;"></div>
+								<div class="color" style="background-color: #bf00ff;"></div>
+
+								<div class="color" style="background-color: #990000;"></div>
+								<div class="color" style="background-color: #994d00;"></div>
+								<div class="color" style="background-color: #999900;"></div>
+								<div class="color" style="background-color: #739900;"></div>
+								<div class="color" style="background-color: #269900;"></div>
+								<div class="color" style="background-color: #00994d;"></div>
+								<div class="color" style="background-color: #009973;"></div>
+								<div class="color" style="background-color: #004d99;"></div>
+								<div class="color" style="background-color: #000099;"></div>
+								<div class="color" style="background-color: #4d0099;"></div>
+								<div class="color" style="background-color: #730099;"></div>
+							</div>
+						</div>
+					</div>
+					<button id="join">Join Room</button>
+				</form>
+			</div>
+		</div>
+	</body>
+
+	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script>
+		var joinCanvas = document.getElementById('joinPlayer');
+		var createCanvas = document.getElementById('createPlayer');
+		var ctx = joinCanvas.getContext('2d');
+		var ctx2 = createCanvas.getContext('2d');
+		var drawing = false;
+		
+		var player = [];
+		for(let i = 0; i<12; i++) {
+			player.push([]);
+			for(let j = 0; j<12; j++) {
+				player[i].push('rgb(255,255,255)');
+			}
+		}
+
+		window.addEventListener('resize', function() {
+			joinCanvas.style.height = joinCanvas.clientWidth + "px";
+			createCanvas.style.height = createCanvas.clientWidth + "px";
+		})
+		
+		joinCanvas.addEventListener('mousedown', (e) => beginDraw(e));
+		createCanvas.addEventListener('mousedown', (e) => beginDraw(e));
+
+		joinCanvas.addEventListener('mousemove', (e) => draw(e));
+		createCanvas.addEventListener('mousemove', (e) => draw(e));
+
+		joinCanvas.addEventListener('mouseleave', endDraw);
+		createCanvas.addEventListener('mouseleave', endDraw);
+
+		init();
+		function init() {
+			let dataURL = localStorage.getItem('skin');
+			let skin = new Image;
+			skin.src = dataURL;
+
+			skin.onload = function() {
+				ctx.drawImage(skin, 0, 0);
+				ctx2.drawImage(skin, 0, 0);
+				let data = ctx.getImageData(0,0,12,12).data;
+
+				for(let y = 0; y<12; y++) {
+					for(let x = 0; x<12; x++) {
+						let r = data[x * 4 + y * (4 * 12)];
+						let g = data[x * 4 + y * (4 * 12) + 1];
+						let b = data[x * 4 + y * (4 * 12) + 2];
+						player[y][x] = 'rgb('+ r +','+ g +','+ b +')';
+					}
+				}
+			}
+		}
+
+		function beginDraw(e) {
+			drawing = true;
+
+			let rect = e.target.getBoundingClientRect();
+			let x = Math.floor((e.clientX-rect.left)/e.target.clientWidth*12);
+			let y = Math.floor((e.clientY-rect.top)/e.target.clientWidth*12);
+			player[y][x] = color;
+		}
+
+		function draw(e) {
+			for(let y = 0; y<12; y++) {
+				for(let x = 0; x<12; x++) {
+					ctx.fillStyle = player[y][x];
+					ctx.fillRect(x, y, 1, 1);
+				}
+			}
+
+			ctx.fillStyle = color;
+			let rect = e.target.getBoundingClientRect();
+			let x = Math.floor((e.clientX-rect.left)/e.target.clientWidth*12);
+			let y = Math.floor((e.clientY-rect.top)/e.target.clientWidth*12);
+			ctx.fillRect(x, y, 1, 1);
+
+			ctx2.drawImage(joinCanvas, 0, 0);
+
+			if(drawing) {
+				player[y][x] = color;
+			}
+		}
+
+		function endDraw() {
+			for(let y = 0; y<12; y++) {
+				for(let x = 0; x<12; x++) {
+					ctx.fillStyle = player[y][x];
+					ctx.fillRect(x, y, 1, 1);
+				}
+			}
+			ctx2.drawImage(joinCanvas, 0, 0);
+		}
+
+		window.addEventListener('mouseup', function() {
+			drawing = false;
+		})
+
+
+	</script>
+
+	<script>
+		var color = 'rgb(255, 255, 255)';
+
+		$(function() {
+			let pathString = location.pathname.substr(1).split('/');
+			if(pathString[0] == 'create') {
+				document.body.setAttribute('data-state', 'create');
+				$('#createRoomName').val(pathString[1]);
+			} else if(pathString[0] == 'join') {
+				document.body.setAttribute('data-state', 'join');
+				$('#joinRoomName').val(pathString[1]);
+			}
+
+			if(localStorage.getItem('nickname')) {
+				$('#joinNickname').val(localStorage.getItem('nickname'));
+				$('#createNickname').val(localStorage.getItem('nickname'));
+			}
+
+			$('#create').click(function(e) {
+				if(document.body.getAttribute('data-state') != 'create') {
+					e.preventDefault();
+					document.body.setAttribute('data-state', 'create');
+				}
+			})
+
+			$('#createForm').submit(function(e) {
+				e.preventDefault();
+
+				if($('#minPlayers').val() <= $('#maxPlayers').val()) {
+					let postData = {
+						roomName: $('#createRoomName').val(), 
+						min: $('#minPlayers').val(),
+						max: $('#maxPlayers').val()
+					};
+
+					fetch('/createRoom', {
+						method: 'post',
+						headers: {
+						'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(postData)
+					}).then(function(response) {
+						if(response.ok) {
+							localStorage.setItem("nickname", $('#createNickname').val());
+							localStorage.setItem("skin", createCanvas.toDataURL());
+							window.location = "/" + postData.roomName;
+						}
+						else if(response.status = 500) {
+							console.log("Server already exists.");
+						} else {
+							console.log("Bad Request");
+						}
+					})
+				}
+			})
+
+			$('#join').click(function(e) {
+				if(document.body.getAttribute('data-state') != 'join') {
+					e.preventDefault();
+					document.body.setAttribute('data-state', 'join');
+				}
+			})
+
+			$('#joinForm').submit(function(e) {
+				e.preventDefault();
+
+				localStorage.setItem("nickname", $('#joinNickname').val());
+				localStorage.setItem("skin", createCanvas.toDataURL());
+				window.location = "/" + $('#joinRoomName').val();
+			})
+
+			$('.back').click(function() {
+				document.body.setAttribute('data-state', '');
+			});
+			
+			$('.color').click(function() {
+				color = $(this).css('background-color');
+			})			
+		})
+	</script>
+</html>
