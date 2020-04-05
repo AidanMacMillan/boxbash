@@ -47,6 +47,14 @@ const regionSizes = [
 
 var regions = regionSizes[0];
 var targetRegions = regionSizes[0];
+var waitingText = document.createElement("h1");
+
+init();
+function init() {
+	waitingText.className = "waitingText";
+	waitingText.innerHTML = "Waiting for " + (room.min - room.players.length) + " players...";
+	canvasContainer.appendChild(waitingText);
+}
 
 window.requestAnimationFrame(update);
 function update(time) {
@@ -55,67 +63,77 @@ function update(time) {
 
 	ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
 
-	targetRegions = regionSizes[room.players.length];
+	targetRegions = regionSizes[Object.keys(room.players).length];
 
 	for(let i = 0; i<8; i++) {
 		for(let j = 0; j<4; j++) {
 			regions[i][j] += (targetRegions[i][j] - regions[i][j]) * 0.1;
 		}
-		ctx.fillStyle = 'hsl(' + i*(360/8) + ',100%,50%)';
-		ctx.strokeStyle = 'hsl(' + i*(360/8) + ',100%,75%)';
+
+		let id = Object.keys(room.players)[i];
+		let zoom = regions[0][2]*window.innerWidth/10;
+
 		ctx.save()
 		ctx.beginPath();
+		if(i < Object.keys(room.players).length) {
+			ctx.fillStyle = room.players[id].color;
+		}
+	
 		ctx.rect(regions[i][0]*window.innerWidth, regions[i][1]*window.innerHeight,
 			regions[i][2]*window.innerWidth, regions[i][3]*window.innerHeight);
 		ctx.fill();
 		ctx.clip();
 
-		let zoom = regions[0][2]*window.innerWidth/10;
-		if(i<gameState.players.length && i<room.players.length) {
-			if(socket.id == gameState.players[i].id) {
+		ctx.fillStyle = 'rgba(0,0,0,0.1)';
+		ctx.fillRect(regions[i][0]*window.innerWidth, regions[i][1]*window.innerHeight+regions[i][3]*window.innerHeight/2,
+			regions[i][2]*window.innerWidth, regions[i][3]*window.innerHeight/2);
+		
+		if(i<Object.keys(gameState.players).length && i<Object.keys(room.players).length) {
+			if(socket.id == id) {
+				ctx.strokeStyle = 'white';
 				ctx.lineWidth = 10;
 				ctx.stroke();
 			}
 		
-			ctx.fillStyle = 'rgb(255,255,255)';
 			ctx.imageSmoothingEnabled = false;
 			ctx.font = "24px Blinker";
 			ctx.fillStyle = "white";
 			ctx.textAlign = "center";
-			ctx.fillText(room.players[i].nickname, 
-				regions[i][0]*window.innerWidth + regions[i][2]*window.innerWidth/2 + gameState.players[i].x*zoom, 
-				regions[i][1]*window.innerHeight + regions[i][3]*window.innerHeight/2 + -gameState.players[i].y*zoom - zoom/2 - 24);
+			ctx.fillText(room.players[id].nickname, 
+				regions[i][0]*window.innerWidth + regions[i][2]*window.innerWidth/2 + gameState.players[id].x*zoom, 
+				regions[i][1]*window.innerHeight + regions[i][3]*window.innerHeight/2 + -gameState.players[id].y*zoom - zoom - 24);
 
-			ctx.fillRect(regions[i][0]*window.innerWidth + regions[i][2]*window.innerWidth/2 + gameState.players[i].x*zoom - 1 - zoom/2,
-				regions[i][1]*window.innerHeight + regions[i][3]*window.innerHeight/2 + -gameState.players[i].y*zoom - 1 - zoom/2,
+			ctx.fillRect(regions[i][0]*window.innerWidth + regions[i][2]*window.innerWidth/2 + gameState.players[id].x*zoom - 1 - zoom/2,
+				regions[i][1]*window.innerHeight + regions[i][3]*window.innerHeight/2 + -gameState.players[id].y*zoom - zoom - 1,
 				zoom+2,zoom+2)
-			ctx.drawImage(room.players[i].skin, regions[i][0]*window.innerWidth + regions[i][2]*window.innerWidth/2 + gameState.players[i].x*zoom - zoom/2,
-				regions[i][1]*window.innerHeight + regions[i][3]*window.innerHeight/2 + -gameState.players[i].y*zoom - zoom/2,
+			ctx.drawImage(room.players[id].skin, regions[i][0]*window.innerWidth + regions[i][2]*window.innerWidth/2 + gameState.players[id].x*zoom - zoom/2,
+				regions[i][1]*window.innerHeight + regions[i][3]*window.innerHeight/2 + -gameState.players[id].y*zoom - zoom,
 				zoom,zoom);
 		}
-		ctx.restore();
 
-		ctx.imageSmoothingEnabled = true;
-		ctx.font = "48px Blinker";
-		ctx.fillStyle = "white";
-		ctx.textAlign = "center";
-		ctx.fillText("Waiting for Players", window.innerWidth/2, 60);
+		ctx.restore();		
 	}
 
-	/*
-	if('players' in gameState) {
-		Object.keys(gameState.players).forEach(function(key) {
-			ctx.imageSmoothingEnabled = false;
-			ctx.drawImage(room.players[key].skin, gameState.players[key].x*50, -gameState.players[key].y*50, 50, 50);
-		});
-	}*/
+	let waitingFor = room.min - Object.keys(room.players).length;
+	if(waitingFor < 1) {
+		if(waitingText.innerHTML != "Starting game!") {
+			waitingText.innerHTML = "Starting game!";
+		}
+	} else if(waitingFor == 1) {
+		if(waitingText.innerHTML != "Waiting for 1 more player...") {
+			waitingText.innerHTML = "Waiting for 1 more player...";
+		}
+	} else {
+		if(waitingText.innerHTML != "Waiting for " + waitingFor + " more players...") {
+			waitingText.innerHTML = "Waiting for " + waitingFor + " more players...";
+		}
+	}
 
 	window.requestAnimationFrame(update);
 }
 
 setInterval(function() {
   socket.emit('input', input);
-  input.jump = false;
 }, 1000 / 60);
 
 socket.on('gameState', function(gs) {
@@ -124,30 +142,36 @@ socket.on('gameState', function(gs) {
 
 document.addEventListener('keydown', function(event) {
 	switch (event.keyCode) {
+		case 39:
+			input.right = true;
+			break;
+		case 37: // Left
 		case 65: // A
 			input.left = true;
 			break;
-		case 87: // W
-			if(!jumped) {
-				input.jump = true;
-			}
-			jumped = true;
-			break;
+		case 39:
 		case 68: // D
 			input.right = true;
+			break;
+		case 38:
+		case 87: // W
+			input.jump = true;
 			break;
 	}
 });
   document.addEventListener('keyup', function(event) {
 	switch (event.keyCode) {
-	  case 65: // A
-		input.left = false;
-		break;
-	  case 68: // D
-		input.right = false;
-		break;
+		case 37:
+		case 65: // A
+			input.left = false;
+			break;
+		case 39:
+		case 68: // D
+			input.right = false;
+			break;
+	case 38:
 	case 87: // W
-		jumped = false;
+		input.jump = false;
 		break;
 	}
 });

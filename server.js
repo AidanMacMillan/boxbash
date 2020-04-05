@@ -59,11 +59,15 @@ app.post('/createRoom', function(req, res) {
 io.on('connection', function(socket) {
 
 	socket.on('registerPlayer', function(data) {
-		rooms[data.room].registerPlayer(socket.id, data.nickname, data.skin);
+		rooms[data.room].connectPlayer(socket.id, data.nickname, data.skin);
 		socket.join(data.room);
 		socket.room = data.room;
 
 		io.to(socket.room).emit('updateRoom', rooms[socket.room].getRoom());
+	});
+
+	socket.on('message', function(msg) {
+		io.to(socket.room).emit('message', {id: socket.id, msg: msg});
 	});
 
 	socket.on('input', function(input) {

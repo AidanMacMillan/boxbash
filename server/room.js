@@ -5,23 +5,31 @@ const EXISTS = 1;
 const BAD_REQUEST = 2;
 
 function Room(min, max) {
-	this.players = [];
+	this.players = {};
 	this.min = min;
 	this.max = max;
 	this.gameManager = new GameManager();
+	this.availableColors = [
+		'hsl(0, 100%, 50%)',
+		'hsl(30, 100%, 50%)',
+		'hsl(75, 100%, 50%)',
+		'hsl(105, 100%, 50%)',
+		'hsl(180, 100%, 50%)',
+		'hsl(240, 100%, 50%)',
+		'hsl(270, 100%, 50%)',
+		'hsl(300, 100%, 50%)'
+	];
 
-	this.registerPlayer = function(id, nickname, skin) {
-		this.players.push({id: id, nickname: nickname, skin: skin});
+	this.connectPlayer = function(id, nickname, skin) {
+		let colorIndex = Math.floor(Math.random() * this.availableColors.length);
+		this.players[id] = {nickname: nickname, skin: skin, color: this.availableColors[colorIndex]};
+		this.availableColors.splice(colorIndex, 1);
 		this.gameManager.gameState.onRegisterPlayer(id);
 	}
 
 	this.disconnectPlayer = function(id) {
-		for(let i = 0; i < this.players.length; i++) {
-			if(id == this.players[i].id) {
-				this.players.splice(i,1);
-				break;
-			}
-		}
+		this.availableColors.push(this.players[id].color);
+		delete this.players[id];
 		this.gameManager.gameState.onDisconnectPlayer(id);
 	}
 
@@ -33,7 +41,7 @@ function Room(min, max) {
 		return {
 			players: this.players,
 			min: this.min,
-			max: this.max
+			max: this.max,
 		}
 	}
 

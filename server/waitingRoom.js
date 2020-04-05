@@ -18,20 +18,20 @@ function WaitingRoom() {
 			if(input[key]) {
 				if(input[key].left) {
 					player.velX -= 0.3;
-					if(player.velX < -5) {
-						player.velX = -5;
+					if(player.velX < -8) {
+						player.velX = -8;
 					}
 				}
 				if(input[key].right) {
 					player.velX += 0.3;
-					if(player.velX > 5) {
-						player.velX = 5;
+					if(player.velX > 8) {
+						player.velX = 8;
 					}
 				}
-				if(input[key].right == input[key].left) {
+				if(input[key].right == input[key].left && player.y == 0) {
 					player.velX *= 0.95;
 				}
-				if(input[key].jump) {
+				if(input[key].jump && player.y == 0) {
 					player.velY = 5;
 				}
 			}
@@ -41,6 +41,7 @@ function WaitingRoom() {
 				player.velY = -20;
 			}
 
+			//Position
 			player.x += player.velX/60;
 			player.y += player.velY/60;
 
@@ -51,22 +52,18 @@ function WaitingRoom() {
 			}
 			if(player.x > 4.5) {
 				player.x = 4.5;
-				player.velX = 0;
+				player.velX = -player.velX;
 			}
 			if(player.x < -4.5) {
 				player.x = -4.5;
-				player.velX = 0;
+				player.velX = -player.velX;
 			}
 		}.bind(this));
 	}
 
 	this.getGameState = function() {
-		let gameStatePlayers = [];
-		Object.keys(this.players).forEach(function(key) {
-			gameStatePlayers.push(this.players[key]);
-		}.bind(this));
 		return {
-			players: gameStatePlayers
+			players: this.players
 		};
 	}
 }
