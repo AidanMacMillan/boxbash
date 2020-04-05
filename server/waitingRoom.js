@@ -1,13 +1,32 @@
-function WaitingRoom() {
-	this.players = {};
+var State = require('./gameState'); 
 
-	this.onRegisterPlayer = function(id) {
+function WaitingRoom(room) {
+	this.game = "waitingRoom";
+	this.room = room;
+	this.players = {};
+	this.countdown = 5;
+	this.state = State.STARTED;
+
+	this.onConnectPlayer = function(id) {
 		this.players[id] = {id: id, x: 0, y: 0, velX: 0, velY: 0}
 	}
 	this.onDisconnectPlayer = function(id) {
 		delete this.players[id];
 	}
+
 	this.update = function(input) {
+		if(Object.keys(this.room.players).length >= this.room.min && this.state == State.STARTED) {
+			this.state = State.ENDING;
+			this.countdownStart = Date.now();
+			setTimeout(function() {
+				this.state = State.NEXT;
+			}.bind(this), 5500);
+		}
+
+		if(this.state == State.ENDING) {
+			this.countdown = Math.ceil((this.countdownStart+5000-Date.now())/1000);
+		}
+		
 		Object.keys(this.players).forEach(function(key) {
 			player = this.players[key];
 
@@ -63,7 +82,10 @@ function WaitingRoom() {
 
 	this.getGameState = function() {
 		return {
-			players: this.players
+			game: this.game,
+			players: this.players,
+			state: this.state,
+			countdown: this.countdown
 		};
 	}
 }

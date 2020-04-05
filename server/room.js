@@ -8,29 +8,29 @@ function Room(min, max) {
 	this.players = {};
 	this.min = min;
 	this.max = max;
-	this.gameManager = new GameManager();
+	this.gameManager = new GameManager(this);
 	this.availableColors = [
 		'hsl(0, 100%, 50%)',
 		'hsl(30, 100%, 50%)',
 		'hsl(75, 100%, 50%)',
 		'hsl(105, 100%, 50%)',
 		'hsl(180, 100%, 50%)',
-		'hsl(240, 100%, 50%)',
-		'hsl(270, 100%, 50%)',
+		'hsl(220, 100%, 50%)',
+		'hsl(285, 100%, 60%)',
 		'hsl(300, 100%, 50%)'
 	];
 
 	this.connectPlayer = function(id, nickname, skin) {
 		let colorIndex = Math.floor(Math.random() * this.availableColors.length);
-		this.players[id] = {nickname: nickname, skin: skin, color: this.availableColors[colorIndex]};
+		this.players[id] = {nickname: nickname, skin: skin, score: 0, color: this.availableColors[colorIndex]};
 		this.availableColors.splice(colorIndex, 1);
-		this.gameManager.gameState.onRegisterPlayer(id);
+		this.gameManager.onConnectPlayer(id);
 	}
 
 	this.disconnectPlayer = function(id) {
 		this.availableColors.push(this.players[id].color);
 		delete this.players[id];
-		this.gameManager.gameState.onDisconnectPlayer(id);
+		this.gameManager.onDisconnectPlayer(id);
 	}
 
 	this.setInput = function(id, input) {

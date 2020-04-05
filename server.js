@@ -64,10 +64,13 @@ io.on('connection', function(socket) {
 		socket.room = data.room;
 
 		io.to(socket.room).emit('updateRoom', rooms[socket.room].getRoom());
+		io.to(socket.room).emit('joined', socket.id);
 	});
 
 	socket.on('message', function(msg) {
-		io.to(socket.room).emit('message', {id: socket.id, msg: msg});
+		if(msg.trim() != "") {
+			io.to(socket.room).emit('message', {id: socket.id, msg: msg.trim()});
+		}
 	});
 
 	socket.on('input', function(input) {
@@ -77,6 +80,7 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', function() {
 		if('room' in socket) {
 			rooms[socket.room].disconnectPlayer(socket.id);
+			io.to(socket.room).emit('left', socket.id);
 			io.to(socket.room).emit('updateRoom', rooms[socket.room].getRoom());
 		}
 	});
@@ -85,10 +89,12 @@ io.on('connection', function(socket) {
 
 setInterval(function() {
 	Object.keys(rooms).forEach(function(key) {
-		if(rooms[key].gameManager.gameState) {
+		rooms[key].gameManager.update(io, key);
+		/*
+		if(rooms[key].gameManager.gameState == "started") {
 			rooms[key].gameManager.gameState.update(rooms[key].gameManager.input);
 			io.to(key).emit('gameState', rooms[key].gameManager.gameState.getGameState());
-		}
+		}*/
 	})
 }, 1000 / 60);
 

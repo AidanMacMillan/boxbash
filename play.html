@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<link href="https://fonts.googleapis.com/css2?family=Blinker:wght@300;600&display=swap" rel="stylesheet">
-		<title>BosBash.io | Waiting Room</title>
+		<title>Waiting Room | BoxBash.io</title>
 		<style>
 			html, body {
 				height: 100%;
@@ -13,6 +13,7 @@
 
 			body { 
 				margin: 0;
+				overflow: hidden;
 			}
 
 			canvas {
@@ -61,7 +62,6 @@
 
 			.message {
 				float: right;
-				height: 26px;
 				width: 300px;
 				padding: 4px 8px;
 				box-sizing: border-box;
@@ -74,14 +74,14 @@
 				display: flex;
 				flex-direction: column-reverse;
 				width: 300px;
-				height: 100px;
+				max-height: 100px;
 				overflow-x: hidden;
-				overflow-y: overlay;
+				overflow-y: scroll;
 				transition: 0.5s;
 			}
 
 			#chat:hover #messages {
-				height: 500px;
+				max-height: 500px;
 				opacity: 1;
 			}
 			
@@ -96,11 +96,75 @@
 			::-webkit-scrollbar-thumb {
 				background: rgba(255,255,255,0.8);
 			}
+
+			#info {
+				position: absolute;
+
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+
+				transform: translateX(-150%);
+			}
+
+			.infoContainer {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%,-50%);
+			}
+
+			#gameTitle {
+				font-size: 3em;
+				text-shadow: 0px 3px rgba(0,0,0,0.5);
+				margin-bottom: 10px;
+			}
+
+			#gameMode {
+				font-size: 2em;
+				text-shadow: 0px 3px rgba(0,0,0,0.5);
+				margin-top: 0px;
+				margin-bottom: 30px;
+			}
+
+			#info:before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				transform: scaleX(1.25) skewX(-10deg);
+				background-color: rgb(60,60,70);
+			}
+
+			@keyframes showBoard {
+				0% {
+					transform: translateX(-150%);
+				}
+				20% {
+					transform: translateX(0%);
+				}
+				80% {
+					transform: translateX(0%);
+				}
+				100% {
+					transform: translateX(150%);
+				}
+			}
 		</style>
 	</head>
 	<body>
 		<canvas id="mainCanvas"></canvas>
 		<div id="canvasContainer"></div>
+		<div id="info">
+			<div class="infoContainer">
+				<h1 id="gameTitle">Snake</h1>
+				<h2 id="gameMode">Free-for-all</h2>
+				<div id="gameDescription">The classic game of snake... don't hit the walls or any trails.</div>
+			</div>
+		</div>
 		<div id="chat">
 			<div id="messages">
 
@@ -129,9 +193,6 @@
 			})
 		</script>
 		<script>
-			var chatMessages = document.getElementById('messages');
-			var chatMessage = document.getElementById('chatMessage');
-			var messages = [];
 			var socket = io({transports: ['websocket']});
 			socket.emit('registerPlayer', {
 				room: location.pathname.substr(1),
@@ -144,6 +205,7 @@
 				min: 0,
 				max: 0
 			};
+
 			socket.on('updateRoom', function(rm) {
 				Object.keys(rm.players).forEach(function(id) {
 					let dataURL = rm.players[id].skin;
@@ -154,31 +216,10 @@
 				})
 				room = rm;
 			});
-
-			chatMessage.addEventListener('keyup', function(e) {
-				if(e.keyCode == 13) {
-					if(chatMessage.value != "") {
-						socket.emit('message', chatMessage.value);
-						chatMessage.value = "";
-					}
-				}
-			})
-
-			chat.addEventListener('mouseleave', function(e) {
-				chatMessages.scrollTop = chatMessages.scrollHeight;
-			})
-
-			socket.on('message', function(msg) {
-				let message = document.createElement('div');
-				message.className = 'message';
-				let name = document.createElement('b');
-				name.style.color = room.players[msg.id].color;
-				name.innerText = room.players[msg.id].nickname + " ";
-				message.innerText = msg.msg;
-				message.prepend(name);
-				chatMessages.prepend(message);
-			});
 		</script>
-		<script src="/waitingRoom.js"></script>
+		<script src="chat.js"></script>
+		<script src="waitingRoom.js"></script>
+		<script src="snake.js"></script>
+		<script src="gameManager.js"></script>
 	</body>
 </html>
