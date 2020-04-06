@@ -74,7 +74,9 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('input', function(input) {
-		rooms[socket.room].setInput(socket.id, input);
+		if(socket.room in rooms) {
+			rooms[socket.room].setInput(socket.id, input);
+		}
 	})
 
 	socket.on('disconnect', function() {
