@@ -20,7 +20,8 @@ function Snake() {
 
 		for(let i = 0; i<24; i++) {
 			for(let j = 0; j<24; j++) {
-				let id = gameState.grid[i][j];
+				let id = gameState.grid[j*24+i];
+				console.log(id);
 				if(id != "") {
 					ctx.fillStyle = room.players[id].color;
 					ctx.fillRect(x + i*zoom, y + j*zoom, zoom, zoom);

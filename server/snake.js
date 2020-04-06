@@ -8,11 +8,7 @@ function Snake(room) {
 	this.spawnSpots = [[3,10,0],[3,13,0],[20,10,2],[20,13,2],[10,3,1],[13,3,1],[10,20,3],[13,20,3]];
 	this.players = {};
 	this.state = State.INFO;
-	this.grid = [];
-	
-	for(let i = 0; i<24; i++) {
-		this.grid.push(Array(24).fill(""));
-	}
+	this.grid = Array(24*24).fill("");
 
 	Object.keys(room.players).forEach(function(key) {
 		let spawnIndex = Math.floor(Math.random()*this.spawnSpots.length);
@@ -53,7 +49,7 @@ function Snake(room) {
 				switch(player.dir) {
 					case 0:
 						if(Math.ceil(player.x) != player.lastX) {	
-							this.grid[player.lastX][player.lastY] = key;
+							this.grid[player.lastX+player.lastY*24] = key;
 	
 							if('dir' in input[key] && input[key].dir != 2) {
 								this.checkInput(input[key].dir, player);
@@ -69,7 +65,7 @@ function Snake(room) {
 						break;
 					case 1:
 						if(Math.ceil(player.y) != player.lastY) {
-							this.grid[player.lastX][player.lastY] = key;
+							this.grid[player.lastX+player.lastY*24] = key;
 	
 							if('dir' in input[key] && input[key].dir != 3) {
 								this.checkInput(input[key].dir, player);
@@ -84,7 +80,7 @@ function Snake(room) {
 						break;
 					case 2:
 						if(Math.floor(player.x) != player.lastX) {
-							this.grid[player.lastX][player.lastY] = key;
+							this.grid[player.lastX+player.lastY*24] = key;
 	
 							if('dir' in input[key] && input[key].dir != 0) {
 								this.checkInput(input[key].dir, player);
@@ -99,7 +95,7 @@ function Snake(room) {
 						break;
 					case 3:
 						if(Math.floor(player.y) != player.lastY) {
-							this.grid[player.lastX][player.lastY] = key;
+							this.grid[player.lastX+player.lastY*24] = key;
 
 							if('dir' in input[key] && input[key].dir != 1) {
 								this.checkInput(input[key].dir, player);
@@ -118,7 +114,7 @@ function Snake(room) {
 	}
 
 	this.checkDeath = function (x,y,key) {
-		if(this.grid[x][y] !== "") {
+		if(this.grid[y*24+x] != "") {
 			this.removePlayer(key);
 			this.players[key].alive = false;
 		}
@@ -127,8 +123,8 @@ function Snake(room) {
 	this.removePlayer = function(key) {
 		for(let x = 0; x<24; x++) {
 			for(let y = 0; y<24; y++) {
-				if(this.grid[x][y] == key) {
-					this.grid[x][y] = "";
+				if(this.grid[y*24+x] == key) {
+					this.grid[y*24+x] = "";
 				}
 			}
 		}
