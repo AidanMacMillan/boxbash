@@ -62,6 +62,8 @@ function WaitingRoom() {
 					ctx.lineWidth = 10;
 					ctx.stroke();
 				}
+
+				this.predict(gameState.players[id]);
 				
 				ctx.font = "24px Blinker";
 				ctx.fillStyle = "white";
@@ -88,6 +90,56 @@ function WaitingRoom() {
 			if(this.waitingText.innerHTML != "Waiting for " + waitingFor + " more players!") {
 				this.waitingText.innerHTML = "Waiting for " + waitingFor + " more players!";
 			}
+		}
+	}
+
+	this.predict = function(player) {
+		//Gravity
+		player.velY -= 0.3;
+
+		//Input
+		if(input) {
+			if(input.left) {
+				player.velX -= 0.3;
+				if(player.velX < -8) {
+					player.velX = -8;
+				}
+			}
+			if(input.right) {
+				player.velX += 0.3;
+				if(player.velX > 8) {
+					player.velX = 8;
+				}
+			}
+			if(input.right == input.left && player.y == 0) {
+				player.velX *= 0.95;
+			}
+			if(input.jump && player.y == 0) {
+				player.velY = 5;
+			}
+		}
+
+		//Movement
+		if(player.velY < -20) {
+			player.velY = -20;
+		}
+
+		//Position
+		player.x += player.velX/60;
+		player.y += player.velY/60;
+
+		//Collisions
+		if(player.y < 0) {
+			player.y = 0;
+			player.velY = 0;
+		}
+		if(player.x > 4.5) {
+			player.x = 4.5;
+			player.velX = -player.velX;
+		}
+		if(player.x < -4.5) {
+			player.x = -4.5;
+			player.velX = -player.velX;
 		}
 	}
 
