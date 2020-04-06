@@ -50,6 +50,13 @@ document.addEventListener('keydown', function(e) {
 });
 
 document.addEventListener('keyup', function(e) {
+	if(e.keyCode == 27) {
+		document.activeElement.blur();
+		input.enabled = true;
+	}
+	if(e.keyCode == 13) {
+		chatMessage.focus();
+	}
 	if(input.enabled) {
 		game.handleKeyUp(e);
 	}
@@ -64,4 +71,4 @@ document.addEventListener('blur', function() {
 	if(document.activeElement == document.body) {
 		input.enabled = true;
 	}
-});
+}, true);

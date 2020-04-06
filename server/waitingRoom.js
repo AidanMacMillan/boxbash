@@ -36,23 +36,31 @@ function WaitingRoom(room) {
 			//Input
 			if(input[key]) {
 				if(input[key].left) {
-					player.velX -= 0.3;
+					player.velX -= 1;
 					if(player.velX < -8) {
 						player.velX = -8;
 					}
 				}
 				if(input[key].right) {
-					player.velX += 0.3;
+					player.velX += 1;
 					if(player.velX > 8) {
 						player.velX = 8;
 					}
 				}
-				if(input[key].right == input[key].left && player.y == 0) {
-					player.velX *= 0.95;
+				if(input[key].right == input[key].left) {
+					player.velX *= 0.85;
 				}
-				if(input[key].jump && player.y == 0) {
-					player.velY = 5;
-				}
+				if(input[key].jump) {
+					if(player.y == 0) {
+						player.velY = 5;
+					}
+					else if(player.x == 4.5) {
+						player.velX = -8;
+					}
+					else if(player.x == -4.5) {
+						player.velX = 8;
+					}
+				} 
 			}
 
 			//Movement
@@ -71,11 +79,11 @@ function WaitingRoom(room) {
 			}
 			if(player.x > 4.5) {
 				player.x = 4.5;
-				player.velX = -player.velX;
+				player.velX = 0;
 			}
 			if(player.x < -4.5) {
 				player.x = -4.5;
-				player.velX = -player.velX;
+				player.velX = 0;
 			}
 		}.bind(this));
 	}

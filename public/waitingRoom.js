@@ -58,12 +58,11 @@ function WaitingRoom() {
 			//Draw player
 			if(id in room.players && id in gameState.players) {
 				if(socket.id == id) {
+					this.predict(gameState.players[id]);
 					ctx.strokeStyle = 'white';
 					ctx.lineWidth = 10;
 					ctx.stroke();
 				}
-
-				this.predict(gameState.players[id]);
 				
 				ctx.font = "24px Blinker";
 				ctx.fillStyle = "white";
@@ -100,22 +99,30 @@ function WaitingRoom() {
 		//Input
 		if(input) {
 			if(input.left) {
-				player.velX -= 0.3;
+				player.velX -= 1;
 				if(player.velX < -8) {
 					player.velX = -8;
 				}
 			}
 			if(input.right) {
-				player.velX += 0.3;
+				player.velX += 1;
 				if(player.velX > 8) {
 					player.velX = 8;
 				}
 			}
-			if(input.right == input.left && player.y == 0) {
-				player.velX *= 0.95;
+			if(input.right == input.left) {
+				player.velX *= 0.85;
 			}
-			if(input.jump && player.y == 0) {
-				player.velY = 5;
+			if(input.jump) {
+				if(player.y == 0) {
+					player.velY = 5;
+				}
+				else if(player.x == 4.5) {
+					player.velX = -8;
+				}
+				else if(player.x == -4.5) {
+					player.velX = 8;
+				}
 			}
 		}
 
@@ -135,11 +142,11 @@ function WaitingRoom() {
 		}
 		if(player.x > 4.5) {
 			player.x = 4.5;
-			player.velX = -player.velX;
+			player.velX = 0;
 		}
 		if(player.x < -4.5) {
 			player.x = -4.5;
-			player.velX = -player.velX;
+			player.velX = 0;
 		}
 	}
 
@@ -161,7 +168,7 @@ function WaitingRoom() {
 	}
 
 	this.handleKeyUp = function(e) {
-		switch (event.keyCode) {
+		switch (e.keyCode) {
 			case 37:
 			case 65: // A
 				input.left = false;
