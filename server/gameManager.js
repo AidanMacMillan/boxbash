@@ -16,7 +16,7 @@ function GameManager(room) {
 			
 		} 
 		else if(this.gameState.state == State.NEXT) {
-			this.gameState = new Snake();
+			this.gameState = new Snake(room);
 			io.to(key).emit('startGame', this.gameState.getGameState());
 		}
 		else {

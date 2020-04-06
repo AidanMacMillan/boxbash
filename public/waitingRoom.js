@@ -93,9 +93,6 @@ function WaitingRoom() {
 
 	this.handleKeyDown = function(e) {
 		switch(e.keyCode) {
-			case 39:
-				input.right = true;
-				break;
 			case 37: // Left
 			case 65: // A
 				input.left = true;
