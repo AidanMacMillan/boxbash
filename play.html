@@ -245,59 +245,11 @@
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-		<script>
-			var canvasContainer = document.getElementById('canvasContainer');
-			var canvas = document.getElementById('mainCanvas');
-			var ctx = canvas.getContext('2d');
-
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-			window.addEventListener('resize', function() {
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
-			})
-		</script>
-		<script>
-			var socket = io({transports: ['websocket'], reconnection: false});
-			socket.emit('registerPlayer', {
-				room: location.pathname.substr(1),
-				nickname: localStorage.getItem('nickname'),
-				skin: localStorage.getItem('skin')
-			});
-
-			var room = {
-				players: {},
-				min: 0,
-				max: 0
-			};
-
-
-			var disconnected = document.getElementById('disconnected');
-			var refresh = document.getElementById('refresh');
-
-			refresh.addEventListener('click', function() {
-				location.reload();
-			})
-
-			socket.on('disconnect', function(data) {
-				disconnected.style.animation = "5s showDisconnected";
-				disconnected.style.display = "block";
-			});
-
-			socket.on('updateRoom', function(rm) {
-				Object.keys(rm.players).forEach(function(id) {
-					let dataURL = rm.players[id].skin;
-					let skin = new Image;
-					skin.src = dataURL;
-
-					rm.players[id].skin = skin;
-				})
-				room = rm;
-			});
-		</script>
-		<script src="chat.js"></script>
+		
 		<script src="waitingRoom.js"></script>
 		<script src="snake.js"></script>
+		<script src="client.js"></script>
+		<script src="chat.js"></script>
 		<script src="gameManager.js"></script>
 	</body>
 </html>

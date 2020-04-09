@@ -10,8 +10,11 @@ const regionSizes = [
 	[[0,0,1/4,1/2],[1/4,0,1/4,1/2],[0,1/2,1/4,1/2],[1/4,1/2,1/4,1/2],[2/4,0,1/4,1/2],[2/4,1/2,1/4,1/2],[3/4,0,1/4,1/2],[3/4,1/2,1/4,1/2]]
 ]
 
-function WaitingRoom() {
+function WaitingRoom(gameState) {
 	this.game = 'waitingRoom';
+	this.gameState = gameState;
+	this.targetGameState = gameState;
+
 	input = {enabled: true, left: false, right: false, jump: false}
 	this.waitingText = document.createElement("h1");
 	this.regions = regionSizes[0];
@@ -20,13 +23,30 @@ function WaitingRoom() {
 	this.waitingText.innerHTML = "Waiting for " + (room.min - room.players.length) + " players...";
 	canvasContainer.appendChild(this.waitingText);
 
+	this.updateGameState = function(gameState) {
+		this.targetGameState = gameState;
+	}
+
+	this.interpolate = function() {
+		Object.keys(this.targetGameState.players).forEach(function(id) {
+			if(id in gameState.players) {
+				this.gameState.players[id].x += (this.targetGameState.players[id].x-this.gameState.players[id].x)*0.5;
+				this.gameState.players[id].y += (this.targetGameState.players[id].y-this.gameState.players[id].y)*0.5;
+			} else {
+				this.gameState.players[id] = this.targetGameState.players[id];
+			}
+		}.bind(this));
+	}
+
 	this.update = function(deltaTime) {
 		ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
 		this.targetRegions = regionSizes[Object.keys(room.players).length];
+		this.interpolate();
 
 		for(let i = 0; i<8; i++) {
 			//Get id of player at index
 			let id = Object.keys(room.players)[i];
+			let gameState = this.gameState;
 
 			//Lerp region to target region
 			for(let j = 0; j<4; j++) {

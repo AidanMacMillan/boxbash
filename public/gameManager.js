@@ -1,27 +1,6 @@
 var input = {enabled: true};
-var game = new WaitingRoom();
-var gameState = {players: {}};
 
 var info = document.getElementById('info');
-
-socket.on('gameState', function(gs) {
-	gameState = gs;
-})
-
-socket.on('startGame', function(gs) {
-	gameState = gs;
-	canvasContainer.innerHTML = "";
-	startGame(gs.game);
-});
-
-function startGame(gameName) {
-	switch(gameName) {
-		case 'snake':
-			game = new Snake();
-			info.style.animation = '5s showBoard';
-			break;
-	}
-}
 
 window.requestAnimationFrame(update);
 var lastTime = 0;
@@ -29,11 +8,7 @@ function update(time) {
 	deltaTime = (time - lastTime)/1000;
 	lastTime = time;
 
-	/*
-	if(game.game != gameState.game) {
-		startGame(gameState.game);
-	}*/
-	if(gameState.state == 1 || gameState.state == 2 || gameState.state == 3) {
+	if(game.game != 'none') {
 		game.update(deltaTime);
 	}
 	window.requestAnimationFrame(update);
