@@ -39,10 +39,11 @@ function WaitingRoom(gameState) {
 	}
 
 	this.update = function(deltaTime) {
-		ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
-		this.targetRegions = regionSizes[Object.keys(room.players).length];
 		this.interpolate();
 
+		ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+		this.targetRegions = regionSizes[Object.keys(room.players).length];
+		
 		for(let i = 0; i<8; i++) {
 			//Get id of player at index
 			let id = Object.keys(room.players)[i];
@@ -78,7 +79,6 @@ function WaitingRoom(gameState) {
 			//Draw player
 			if(id in room.players && id in gameState.players) {
 				if(socket.id == id) {
-					this.predict(gameState.players[id]);
 					ctx.strokeStyle = 'white';
 					ctx.lineWidth = 10;
 					ctx.stroke();
@@ -109,64 +109,6 @@ function WaitingRoom(gameState) {
 			if(this.waitingText.innerHTML != "Waiting for " + waitingFor + " more players!") {
 				this.waitingText.innerHTML = "Waiting for " + waitingFor + " more players!";
 			}
-		}
-	}
-
-	this.predict = function(player) {
-		//Gravity
-		player.velY -= 0.3;
-
-		//Input
-		if(input) {
-			if(input.left) {
-				player.velX -= 1;
-				if(player.velX < -8) {
-					player.velX = -8;
-				}
-			}
-			if(input.right) {
-				player.velX += 1;
-				if(player.velX > 8) {
-					player.velX = 8;
-				}
-			}
-			if(input.right == input.left) {
-				player.velX *= 0.85;
-			}
-			if(input.jump) {
-				if(player.y == 0) {
-					player.velY = 5;
-				}
-				else if(player.x == 4.5) {
-					player.velX = -8;
-				}
-				else if(player.x == -4.5) {
-					player.velX = 8;
-				}
-			}
-		}
-
-		//Movement
-		if(player.velY < -20) {
-			player.velY = -20;
-		}
-
-		//Position
-		player.x += player.velX/60;
-		player.y += player.velY/60;
-
-		//Collisions
-		if(player.y < 0) {
-			player.y = 0;
-			player.velY = 0;
-		}
-		if(player.x > 4.5) {
-			player.x = 4.5;
-			player.velX = 0;
-		}
-		if(player.x < -4.5) {
-			player.x = -4.5;
-			player.velX = 0;
 		}
 	}
 

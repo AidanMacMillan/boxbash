@@ -33,6 +33,10 @@ function startGame(gameState) {
 		case 'waitingRoom':
 			game = new WaitingRoom(gameState);
 			break;
+		case 'pong':
+			game = new Pong(gameState);
+			info.style.animation = '5s showBoard';
+			break;
 		case 'snake':
 			game = new Snake(gameState);
 			info.style.animation = '5s showBoard';

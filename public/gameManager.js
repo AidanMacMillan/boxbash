@@ -19,7 +19,7 @@ setInterval(function() {
 }, 1000 / 60);
 
 document.addEventListener('keydown', function(e) {
-	if(input.enabled) {
+	if(input.enabled && game.game != 'none') {
 		game.handleKeyDown(e);
 	}
 });
@@ -32,14 +32,16 @@ document.addEventListener('keyup', function(e) {
 	if(e.keyCode == 13) {
 		chatMessage.focus();
 	}
-	if(input.enabled) {
+	if(input.enabled && game.game != 'none') {
 		game.handleKeyUp(e);
 	}
 });
 
 document.addEventListener('focus', function() {
 	input.enabled = false;
-	game.handleFocus();
+	if(game.game != 'none') {
+		game.handleFocus();
+	}
 }, true);
 
 document.addEventListener('blur', function() {

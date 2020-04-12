@@ -2,6 +2,7 @@ var State = require('./gameState');
 
 var WaitingRoom = require('./waitingRoom');
 var Snake = require('./snake');
+var Pong = require('./pong');
 
 function GameManager(room) {
 	this.room = room;
@@ -16,8 +17,7 @@ function GameManager(room) {
 			
 		} 
 		else if(this.gameState.state == State.NEXT) {
-			this.gameState = new Snake(room);
-			io.to(key).emit('startGame', this.gameState.getGameState());
+			this.gameState = new Pong(room);
 		}
 		else {
 			this.gameState.update(this.input);
