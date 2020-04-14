@@ -8,7 +8,10 @@ function Physics(gravity, bounds) {
 	this.addEntity = function(entityId, x, y, w, h, vX, vY, isStatic) {
 		this.entities[entityId] = {x: x, y: y, width: w, height: h, vX: vX, vY: vY, isStatic: isStatic};
 		this.entities[entityId].mass = 1;
-		this.entities.onCollision = function(){};
+		this.entities[entityId].drag = 0;
+		this.entities[entityId].friction = 0;
+		this.entities[entityId].noCollision = [];
+		this.entities[entityId].onCollision = function(){};
 	}
 
 	this.update = function() {
@@ -16,6 +19,9 @@ function Physics(gravity, bounds) {
 			let entity = this.entities[id];
 
 			if(!entity.isStatic) {
+				entity.vX *= 1-entity.drag;
+				entity.vY *= 1-entity.drag;
+
 				//Update positions
 				entity.x += entity.vX/60;
 				entity.y += entity.vY/60;
@@ -24,7 +30,8 @@ function Physics(gravity, bounds) {
 				Object.keys(this.entities).forEach(function(aId) {
 					let aEntity = this.entities[aId];
 
-					if(this.getLeft(entity) < this.getRight(aEntity) &&
+					if(aId != id && 
+							this.getLeft(entity) < this.getRight(aEntity) &&
 							this.getRight(entity) > this.getLeft(aEntity) &&
 							this.getBottom(entity) < this.getTop(aEntity) &&
 							this.getTop(entity) > this.getBottom(aEntity)) {
@@ -39,12 +46,14 @@ function Physics(gravity, bounds) {
 								} else {
 									entity.x = this.getLeft(aEntity) - entity.width/2;
 								}
+								entity.vX = -entity.vX;
 							} else {
 								if(dy < 0) {
 									entity.y = this.getTop(aEntity) + entity.height/2;
 								} else {
 									entity.y = this.getBottom(aEntity) - entity.height/2;
 								}
+								entity.vY = -entity.vY;
 							}
 						} else {
 							let dx = (aEntity.x-entity.x);
@@ -69,6 +78,8 @@ function Physics(gravity, bounds) {
 								aEntity.vY = tmp * entity.mass/aEntity.mass;
 							}
 						}
+
+						entity.onCollision(aId);
 					}
 
 				}.bind(this));

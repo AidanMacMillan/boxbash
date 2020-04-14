@@ -34,20 +34,55 @@ function Pong(gameState) {
 		let height = zoom*10;
 
 		//Draw background
-		ctx.fillStyle = 'hsl(192, 100%, 40%)';
+		ctx.fillStyle = 'hsl(0, 100%, 40%)';
 		ctx.fillRect(0,0,window.innerWidth/2, window.innerHeight);
-		ctx.fillStyle = 'hsl(0, 100%, 60%)';
+		ctx.fillStyle = 'hsl(195, 100%, 40%)';
 		ctx.fillRect(window.innerWidth/2,0,window.innerWidth/2, window.innerHeight);
 
+		ctx.fillStyle = 'hsl(0, 100%, 50%)';
+		ctx.fillRect(x+zoom/2, y, width/2-zoom/2, height);
+		ctx.fillStyle = 'hsl(195, 100%, 50%)';
+		ctx.fillRect(x+width/2, y, width/2-zoom/2, height);
 
-		ctx.fillStyle = 'hsl(192, 100%, 50%)';
-		ctx.fillRect(x, y, width/2, height);
-		ctx.fillStyle = 'hsl(0, 100%, 70%)';
-		ctx.fillRect(x+width/2, y, width/2, height);
+		//Draw goals
+		//Goal 1
+		ctx.fillStyle = 'white';
+		ctx.fillRect(x, y+zoom*2.5, zoom/2, zoom*5);
+
+		let goalGlow = ctx.createLinearGradient(x+zoom/2, 0, x+zoom, 0);
+		goalGlow.addColorStop(0, "rgba(255,255,255,0.5)");
+		goalGlow.addColorStop(1, "rgba(255,255,255,0)");
+		ctx.fillStyle = goalGlow;
+		ctx.fillRect(x+zoom/2, y+zoom*2.5, zoom/2, zoom*5);
+
+		//Goal 2
+		ctx.fillStyle = 'white';
+		ctx.fillRect(x+width-zoom/2, y+zoom*2.5, zoom/2, zoom*5);
+
+		goalGlow = ctx.createLinearGradient(x+width-zoom, 0, x+width-zoom/2, 0);
+		goalGlow.addColorStop(0, "rgba(255,255,255,0)");
+		goalGlow.addColorStop(1, "rgba(255,255,255,0.5)");
+		ctx.fillStyle = goalGlow;
+		ctx.fillRect(x+width-zoom, y+zoom*2.5, zoom/2, zoom*5);
+		
+		//Draw Centerline
+		ctx.lineWidth = zoom/10;
+		ctx.strokeStyle = 'white';
+		ctx.beginPath();
+		ctx.moveTo(window.innerWidth/2, 0);
+		ctx.lineTo(window.innerWidth/2, window.innerHeight);
+		ctx.stroke();
 
 		//Draw Ball
+		let ballX = x + width/2 + this.gameState.ball.x * zoom - zoom/4;
+		let ballY = y + height/2 + this.gameState.ball.y * zoom - zoom/4;
 		ctx.fillStyle = 'white';
-		ctx.fillRect(x + width/2 + this.gameState.ball.x * zoom - zoom/4, y + height/2 + this.gameState.ball.y * zoom - zoom/4, zoom/2, zoom/2);
+		ctx.fillRect(ballX, ballY, zoom/2, zoom/2);
+		let ballGlow = ctx.createRadialGradient(ballX+zoom/4, ballY+zoom/4, 0, ballX+zoom/4, ballY+zoom/4, zoom);
+		ballGlow.addColorStop(0, "rgba(255,255,255,0.5)");
+		ballGlow.addColorStop(1, "rgba(255,255,255,0)");
+		ctx.fillStyle = ballGlow;
+		ctx.fillRect(ballX-zoom/4*3, ballY-zoom/4*3, zoom*2, zoom*2);
 
 		//Draw Players
 		Object.keys(this.gameState.players).forEach(function(id) {
@@ -55,11 +90,11 @@ function Pong(gameState) {
 			let playerY = y + height/2 + this.gameState.players[id].y * zoom - zoom/2;
 
 			if(socket.id == id) {
-				ctx.fillStyle = "rgba(255,255,255,1)";
+				ctx.fillStyle = "white";
 			} else {
 				ctx.fillStyle = "rgba(0,0,0,0.15)";
 			}	
-			ctx.fillRect(playerX - 3, playerY - 3, zoom+6, zoom+6);
+			ctx.fillRect(playerX - zoom/20, playerY - zoom/20, zoom+zoom/10, zoom+zoom/10);
 
 			ctx.imageSmoothingEnabled = false;
 			ctx.drawImage(room.players[id].skin, playerX, playerY, zoom, zoom);

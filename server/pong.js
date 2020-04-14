@@ -10,11 +10,28 @@ function Pong(room) {
 	Object.keys(room.players).forEach(function(id) {
 		this.players[id] = {x: 0, y: 0};
 		this.physics.addEntity(id, 0, 0, 1, 1, 0, 0, false);
+		this.physics.entities[id].drag = 0.2;
 	}.bind(this));
 
 	//Add ball
 	this.physics.addEntity('ball', 2, 2, 0.5, 0.5, 1, 0, false);
 	this.physics.entities['ball'].mass = 0.5;
+	this.physics.entities['ball'].onCollision = function(aId) {
+		if(aId == 'goal1' || aId == 'goal2') {
+			this.physics.entities['ball'].y = 0;
+			this.physics.entities['ball'].x = 0;
+			this.physics.entities['ball'].vX = 0;
+			this.physics.entities['ball'].vY = Math.random()*10-5;
+		}
+	}.bind(this);
+
+	this.physics.addEntity('wall1', -9.75, -3.75, 0.5, 2.5, 0, 0, true);
+	this.physics.addEntity('wall2', -9.75, 3.75, 0.5, 2.5, 0, 0, true);
+	this.physics.addEntity('wall3', 9.75, -3.75, 0.5, 2.5, 0, 0, true);
+	this.physics.addEntity('wall4', 9.75, 3.75, 0.5, 2.5, 0, 0, true);
+
+	this.physics.addEntity('goal1', -9.75, 0, 0.5, 5, 0, 0, true);
+	this.physics.addEntity('goal2', 9.75, 0, 0.5, 5, 0, 0, true);
 
 	setTimeout(function() {
 		this.state = State.STARTING;
@@ -27,34 +44,28 @@ function Pong(room) {
 			//Input
 			if(input[key]) {
 				if(input[key].left) {
-					player.vX -= 1;
+					player.vX -= 2;
 					if(player.vX < -8) {
 						player.vX = -8;
 					}
 				}
 				if(input[key].right) {
-					player.vX += 1;
+					player.vX += 2;
 					if(player.vX > 8) {
 						player.vX = 8;
 					}
 				}
-				if(input[key].right == input[key].left) {
-					player.vX *= 0.9;
-				}
 				if(input[key].up) {
-					player.vY -= 1;
+					player.vY -= 2;
 					if(player.vY < -8) {
 						player.vY = -8;
 					}
 				}
 				if(input[key].down) {
-					player.vY += 1;
+					player.vY += 2;
 					if(player.vY > 8) {
 						player.vY = 8;
 					}
-				}
-				if(input[key].up == input[key].down) {
-					player.vY *= 0.9;
 				}
 			}
 		}.bind(this));
