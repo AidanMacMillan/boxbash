@@ -1,17 +1,15 @@
+var Entity = require('./entity');
+
 function Physics(gravity, bounds) {
 	this.gravity = gravity;
 	this.bounds = bounds;
 
 	this.entities = {};
 
-	//Non static entity
-	this.addEntity = function(entityId, x, y, w, h, vX, vY, isStatic) {
-		this.entities[entityId] = {x: x, y: y, width: w, height: h, vX: vX, vY: vY, isStatic: isStatic};
-		this.entities[entityId].mass = 1;
-		this.entities[entityId].drag = 0;
-		this.entities[entityId].friction = 0;
-		this.entities[entityId].noCollision = [];
-		this.entities[entityId].onCollision = function(){};
+	this.addEntity = function(entityId, x, y, w, h, isStatic) {
+		let entity = new Entity(x, y, w, h, isStatic);
+		this.entities[entityId] = entity;
+		return entity;
 	}
 
 	this.update = function() {
@@ -31,10 +29,10 @@ function Physics(gravity, bounds) {
 					let aEntity = this.entities[aId];
 
 					if(aId != id && 
-							this.getLeft(entity) < this.getRight(aEntity) &&
-							this.getRight(entity) > this.getLeft(aEntity) &&
-							this.getBottom(entity) < this.getTop(aEntity) &&
-							this.getTop(entity) > this.getBottom(aEntity)) {
+							entity.getLeft() < aEntity.getRight() &&
+							entity.getRight() > aEntity.getLeft() &&
+							entity.getBottom() < aEntity.getTop() &&
+							entity.getTop() > aEntity.getBottom()) {
 						
 						if(aEntity.isStatic) {
 							let dx = (aEntity.x-entity.x) / aEntity.width * 2;
@@ -42,16 +40,16 @@ function Physics(gravity, bounds) {
 
 							if(Math.abs(dx) > Math.abs(dy)) {
 								if(dx < 0) {
-									entity.x = this.getRight(aEntity) + entity.width/2;
+									entity.x = aEntity.getRight() + entity.width/2;
 								} else {
-									entity.x = this.getLeft(aEntity) - entity.width/2;
+									entity.x = aEntity.getLeft() - entity.width/2;
 								}
 								entity.vX = -entity.vX;
 							} else {
 								if(dy < 0) {
-									entity.y = this.getTop(aEntity) + entity.height/2;
+									entity.y = aEntity.getTop() + entity.height/2;
 								} else {
-									entity.y = this.getBottom(aEntity) - entity.height/2;
+									entity.y = aEntity.getBottom() - entity.height/2;
 								}
 								entity.vY = -entity.vY;
 							}
@@ -90,41 +88,25 @@ function Physics(gravity, bounds) {
 			let entity = this.entities[id];
 			if(!entity.isStatic) {
 				//Bounds collision
-				if(this.getLeft(entity) < this.bounds.left) {
+				if(entity.getLeft() < this.bounds.left) {
 					entity.x = this.bounds.left + entity.width/2;
 					entity.vX = -entity.vX;
 				}
-				if(this.getRight(entity) > this.bounds.right) {
+				if(entity.getRight() > this.bounds.right) {
 					entity.x = this.bounds.right - entity.width/2;
 					entity.vX = -entity.vX;
 				}
-				if(this.getTop(entity) > this.bounds.top) {
+				if(entity.getTop() > this.bounds.top) {
 					entity.y = this.bounds.top - entity.height/2;
 					entity.vY = -entity.vY;
 				}
-				if(this.getBottom(entity) < this.bounds.bottom) {
+				if(entity.getBottom() < this.bounds.bottom) {
 					entity.y = this.bounds.bottom + entity.height/2;
 					entity.vY = -entity.vY;
 				}
 			}
 		}.bind(this));
 	}
-
-	this.getLeft = function(entity) {
-		return entity.x - entity.width/2;
-	}
-
-	this.getRight = function(entity) {
-		return entity.x + entity.width/2;
-	}
-
-	this.getTop = function(entity) {
-		return entity.y + entity.height/2;
-	}
-
-	this.getBottom = function(entity) {
-		return entity.y - entity.height/2;
-	}
 }
 
-module.exports = Physics
+module.exports = Physics;

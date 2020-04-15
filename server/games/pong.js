@@ -1,5 +1,5 @@
 var State = require('./gameState'); 
-var Physics = require('./physics'); 
+var Physics = require('../physics/physics'); 
 
 function Pong(room) {
 	this.game = "pong";
@@ -9,29 +9,29 @@ function Pong(room) {
 	//Add physics players
 	Object.keys(room.players).forEach(function(id) {
 		this.players[id] = {x: 0, y: 0};
-		this.physics.addEntity(id, 0, 0, 1, 1, 0, 0, false);
+		this.physics.addEntity(id, 0, 0, 1, 1, false);
 		this.physics.entities[id].drag = 0.2;
 	}.bind(this));
 
 	//Add ball
-	this.physics.addEntity('ball', 2, 2, 0.5, 0.5, 1, 0, false);
-	this.physics.entities['ball'].mass = 0.5;
-	this.physics.entities['ball'].onCollision = function(aId) {
+	let ball = this.physics.addEntity('ball', 2, 2, 0.5, 0.5, false);
+	ball.mass = 0.5;
+	ball.onCollision = function(aId) {
 		if(aId == 'goal1' || aId == 'goal2') {
-			this.physics.entities['ball'].y = 0;
-			this.physics.entities['ball'].x = 0;
-			this.physics.entities['ball'].vX = 0;
-			this.physics.entities['ball'].vY = Math.random()*10-5;
+			ball.y = 0;
+			ball.x = 0;
+			ball.vX = 0;
+			ball.vY = Math.random()*10-5;
 		}
 	}.bind(this);
 
-	this.physics.addEntity('wall1', -9.75, -3.75, 0.5, 2.5, 0, 0, true);
-	this.physics.addEntity('wall2', -9.75, 3.75, 0.5, 2.5, 0, 0, true);
-	this.physics.addEntity('wall3', 9.75, -3.75, 0.5, 2.5, 0, 0, true);
-	this.physics.addEntity('wall4', 9.75, 3.75, 0.5, 2.5, 0, 0, true);
+	this.physics.addEntity('wall1', -9.75, -3.75, 0.5, 2.5, true);
+	this.physics.addEntity('wall2', -9.75, 3.75, 0.5, 2.5, true);
+	this.physics.addEntity('wall3', 9.75, -3.75, 0.5, 2.5, true);
+	this.physics.addEntity('wall4', 9.75, 3.75, 0.5, 2.5, true);
 
-	this.physics.addEntity('goal1', -9.75, 0, 0.5, 5, 0, 0, true);
-	this.physics.addEntity('goal2', 9.75, 0, 0.5, 5, 0, 0, true);
+	this.physics.addEntity('goal1', -9.75, 0, 0.5, 5, true);
+	this.physics.addEntity('goal2', 9.75, 0, 0.5, 5, true);
 
 	setTimeout(function() {
 		this.state = State.STARTING;

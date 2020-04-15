@@ -3,10 +3,16 @@ var chatMessage = document.getElementById('chatMessage');
 var messages = [];
 
 chatMessage.addEventListener('keyup', function(e) {
+	if(e.keyCode == 27) {
+		document.activeElement.blur();
+	}
 	if(e.keyCode == 13) {
 		if(chatMessage.value != "") {
 			socket.emit('message', chatMessage.value);
 			chatMessage.value = "";
+		} else {
+			document.activeElement.blur();
+			e.stopPropagation();
 		}
 	}
 })

@@ -1,7 +1,9 @@
 var socket = io({transports: ['websocket'], reconnection: false});
 var room = {};
 var game = {game: 'none'};
+var input = {enabled: true};
 
+//Socket
 socket.emit('registerPlayer', {
 	room: location.pathname.substr(1),
 	nickname: localStorage.getItem('nickname'),
@@ -27,6 +29,7 @@ socket.on('gameState', function(gameState) {
 	}
 })
 
+//Game Management
 function startGame(gameState) {
 	canvasContainer.innerHTML = "";
 	switch(gameState.game) {
@@ -43,6 +46,60 @@ function startGame(gameState) {
 			break;
 	}
 }
+
+window.requestAnimationFrame(update);
+var lastTime = 0;
+function update(time) {
+	deltaTime = (time - lastTime)/1000;
+	lastTime = time;
+
+	if(game.game != 'none') {
+		game.update(deltaTime);
+	}
+	window.requestAnimationFrame(update);
+}
+
+setInterval(function() {
+	socket.emit('input', input);
+}, 1000 / 60);
+
+
+//Input Handling
+document.addEventListener('keydown', function(e) {
+	if(input.enabled && game.game != 'none') {
+		game.handleKeyDown(e);
+	}
+	if(e.keyCode == 9) {
+		e.preventDefault();
+	}
+});
+
+document.addEventListener('keyup', function(e) {
+	if(e.keyCode == 13) {
+		chatMessage.focus();
+	}
+	if(input.enabled && game.game != 'none') {
+		game.handleKeyUp(e);
+	}
+});
+
+document.addEventListener('focus', function() {
+	input.enabled = false;
+	if(game.game != 'none') {
+		game.handleFocus();
+	}
+}, true);
+
+document.addEventListener('blur', function() {
+	if(document.activeElement == document.body) {
+		input.enabled = true;
+	}
+}, true);
+
+//Scoreboard Screen
+
+//Info Screen
+var info = document.getElementById('info');
 
 //Disconnection
 var disconnected = document.getElementById('disconnected');

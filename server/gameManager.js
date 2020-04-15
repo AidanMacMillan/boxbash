@@ -1,8 +1,8 @@
-var State = require('./gameState');
+var State = require('./games/gameState');
 
-var WaitingRoom = require('./waitingRoom');
-var Snake = require('./snake');
-var Pong = require('./pong');
+var WaitingRoom = require('./games/waitingRoom');
+var Snake = require('./games/snake');
+var Pong = require('./games/pong');
 
 function GameManager(room) {
 	this.room = room;
