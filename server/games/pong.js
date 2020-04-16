@@ -4,6 +4,7 @@ var Physics = require('../physics/physics');
 function Pong(room) {
 	this.game = "pong";
 	this.players = {};
+	this.state = State.INFO;
 	this.physics = new Physics(0, {left: -10, right: 10, bottom: -5, top: 5});
 
 	//Add physics players
@@ -35,6 +36,21 @@ function Pong(room) {
 
 	setTimeout(function() {
 		this.state = State.STARTING;
+
+		setTimeout(function() {
+			this.state = State.STARTED;
+
+			setTimeout(function() {
+				this.state = State.SCOREBOARD;
+	
+				setTimeout(function() {
+					this.state = State.NEXT;
+				}.bind(this), 4000);
+	
+			}.bind(this), 4000);
+
+		}.bind(this), 4000);
+
 	}.bind(this), 4000);
 
 	this.update = function(input) {

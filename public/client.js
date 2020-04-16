@@ -27,6 +27,29 @@ socket.on('gameState', function(gameState) {
 	} else {
 		game.updateGameState(gameState);
 	}
+	console.log(gameState.state);
+	switch(gameState.state) {
+		case 0:
+			info.className = 'show';
+			scoreboard.className = 'show';
+			break;
+		case 1:
+			info.className = 'exit';
+			scoreboard.className = 'exit';
+			break;
+		case 2:
+			info.className = '';
+			scoreboard.className = '';
+			break;
+		case 3:
+			info.className = '';
+			scoreboard.className = '';
+			break;
+		case 4:
+			info.className = '';
+			scoreboard.className = 'show';
+			break;
+	}
 })
 
 //Game Management
@@ -38,11 +61,9 @@ function startGame(gameState) {
 			break;
 		case 'pong':
 			game = new Pong(gameState);
-			info.style.animation = '5s showBoard';
 			break;
 		case 'snake':
 			game = new Snake(gameState);
-			info.style.animation = '5s showBoard';
 			break;
 	}
 }
@@ -97,7 +118,7 @@ document.addEventListener('blur', function() {
 }, true);
 
 //Scoreboard Screen
-
+var scoreboard = document.getElementById('scoreboard');
 //Info Screen
 var info = document.getElementById('info');
 
@@ -106,8 +127,7 @@ var disconnected = document.getElementById('disconnected');
 var refresh = document.getElementById('refresh');
 
 socket.on('disconnect', function(data) {
-	disconnected.style.animation = "5s showDisconnected";
-	disconnected.style.display = "block";
+	disconnected.className = "show";
 });
 
 refresh.addEventListener('click', function() {

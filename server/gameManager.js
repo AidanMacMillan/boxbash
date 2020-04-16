@@ -21,8 +21,8 @@ function GameManager(room) {
 		}
 		else {
 			this.gameState.update(this.input);
-			io.to(key).emit('gameState', this.gameState.getGameState());
 		}
+		io.to(key).emit('gameState', this.gameState.getGameState());
 	}
 
 	this.onConnectPlayer = function(id) {
