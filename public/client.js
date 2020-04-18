@@ -24,10 +24,8 @@ socket.on('updateRoom', function(rm) {
 socket.on('gameState', function(gameState) {
 	if(game.game != gameState.game) {
 		startGame(gameState);
-	} else {
-		game.updateGameState(gameState);
 	}
-	console.log(gameState.state);
+
 	switch(gameState.state) {
 		case 0:
 			info.className = 'show';
@@ -36,14 +34,17 @@ socket.on('gameState', function(gameState) {
 		case 1:
 			info.className = 'exit';
 			scoreboard.className = 'exit';
+			game.updateGameState(gameState);
 			break;
 		case 2:
 			info.className = '';
 			scoreboard.className = '';
+			game.updateGameState(gameState);
 			break;
 		case 3:
 			info.className = '';
 			scoreboard.className = '';
+			game.updateGameState(gameState);
 			break;
 		case 4:
 			info.className = '';

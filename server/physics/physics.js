@@ -88,21 +88,40 @@ function Physics(gravity, bounds) {
 			let entity = this.entities[id];
 			if(!entity.isStatic) {
 				//Bounds collision
-				if(entity.getLeft() < this.bounds.left) {
-					entity.x = this.bounds.left + entity.width/2;
-					entity.vX = -entity.vX;
-				}
-				if(entity.getRight() > this.bounds.right) {
-					entity.x = this.bounds.right - entity.width/2;
-					entity.vX = -entity.vX;
-				}
-				if(entity.getTop() > this.bounds.top) {
-					entity.y = this.bounds.top - entity.height/2;
-					entity.vY = -entity.vY;
-				}
-				if(entity.getBottom() < this.bounds.bottom) {
-					entity.y = this.bounds.bottom + entity.height/2;
-					entity.vY = -entity.vY;
+				if(entity.bounds) {
+					if(entity.getLeft() < entity.bounds.left) {
+						entity.x = entity.bounds.left + entity.width/2;
+						entity.vX = -entity.vX;
+					}
+					if(entity.getRight() > entity.bounds.right) {
+						entity.x = entity.bounds.right - entity.width/2;
+						entity.vX = -entity.vX;
+					}
+					if(entity.getTop() > entity.bounds.top) {
+						entity.y = entity.bounds.top - entity.height/2;
+						entity.vY = -entity.vY;
+					}
+					if(entity.getBottom() < entity.bounds.bottom) {
+						entity.y = entity.bounds.bottom + entity.height/2;
+						entity.vY = -entity.vY;
+					}
+				} else {
+					if(entity.getLeft() < this.bounds.left) {
+						entity.x = this.bounds.left + entity.width/2;
+						entity.vX = -entity.vX;
+					}
+					if(entity.getRight() > this.bounds.right) {
+						entity.x = this.bounds.right - entity.width/2;
+						entity.vX = -entity.vX;
+					}
+					if(entity.getTop() > this.bounds.top) {
+						entity.y = this.bounds.top - entity.height/2;
+						entity.vY = -entity.vY;
+					}
+					if(entity.getBottom() < this.bounds.bottom) {
+						entity.y = this.bounds.bottom + entity.height/2;
+						entity.vY = -entity.vY;
+					}
 				}
 			}
 		}.bind(this));

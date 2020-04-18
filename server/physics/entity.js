@@ -10,9 +10,10 @@ function Entity(x, y, w, h, isStatic) {
 	this.mass = 1;
 	this.drag = 0;
 	this.friction = 0;
+	this.bounds = false;
 
 	this.onCollision = function(){};
-
+	
 	this.getLeft = function() {
 		return this.x - this.width/2;
 	}
